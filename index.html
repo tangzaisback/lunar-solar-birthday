@@ -15,6 +15,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     :root {
@@ -34,6 +35,8 @@
       color: var(--text-primary);
       font-family: 'Noto Serif KR', Georgia, serif;
       overflow: hidden;
+      -webkit-font-smoothing: antialiased; /* iOS/macOS */
+      overscroll-behavior: none;           /* Android pull-to-refresh 방지 */
     }
 
     /* Atmospheric glow — top */
@@ -61,7 +64,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 3rem 2rem;
+      /* Safe area: 노치/홈 바 영역 확보 */
+      padding:
+        max(3rem, env(safe-area-inset-top))
+        max(2rem, env(safe-area-inset-right))
+        max(3rem, env(safe-area-inset-bottom))
+        max(2rem, env(safe-area-inset-left));
+      /* 가로 모드 등 콘텐츠 넘침 대비 */
+      overflow-y: auto;
       z-index: 1;
       transition:
         opacity  0.6s cubic-bezier(0.4, 0, 0.2, 1),
@@ -157,6 +167,14 @@
       border-bottom-color: var(--accent);
     }
 
+    /* iOS Safari: datetime 내부 파트 색상 명시 (기기 언어 무관하게 적용) */
+    .date-input::-webkit-datetime-edit            { color: var(--text-primary); }
+    .date-input::-webkit-datetime-edit-fields-wrapper { color: var(--text-primary); }
+    .date-input::-webkit-datetime-edit-year-field  { color: var(--text-primary); }
+    .date-input::-webkit-datetime-edit-month-field { color: var(--text-primary); }
+    .date-input::-webkit-datetime-edit-day-field   { color: var(--text-primary); }
+    .date-input::-webkit-datetime-edit-text        { color: var(--text-secondary); opacity: 0.5; }
+
     .date-input::-webkit-calendar-picker-indicator {
       filter: invert(0.5) sepia(0.4) saturate(0.6);
       cursor: pointer;
@@ -185,7 +203,9 @@
       gap: 1rem;
       transition: letter-spacing 0.35s ease, opacity 0.2s ease;
       animation: fadeUp 0.8s 0.6s both;
-      padding: 0.5rem 0;
+      /* 터치 타겟 최소 44px (Apple HIG 권고) */
+      min-height: 44px;
+      padding: 0.75rem 0.5rem;
     }
 
     .cta-btn::before,
@@ -292,6 +312,16 @@
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(18px); }
       to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 가로 모드 / 낮은 화면 대응 */
+    @media (max-height: 600px) {
+      .input-question  { margin-bottom: 1.5rem; }
+      .input-wrap      { margin-bottom: 1.5rem; }
+      .moon-icon       { margin-bottom: 1.2rem; }
+      .result-main     { margin-bottom: 1.2rem; font-size: clamp(1.2rem, 4vw, 1.6rem); }
+      .result-rule     { margin-bottom: 1rem; }
+      .result-meta     { margin-bottom: 2rem; }
     }
   </style>
 </head>
