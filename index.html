@@ -10,320 +10,7 @@
   <meta name="twitter:description" content="옛날 사람들은 생일을 어떻게 알 수 있었을까요? 태어난 날의 절기와 달의 모양을 알아보세요" />
   <meta name="twitter:image" content="이미지 URL" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    :root {
-      --bg: #06060e;
-      --text-primary: #f0e6d3;
-      --text-secondary: #c4ad93;
-      --accent: #c9a96e;
-      --error: #c97a6e;
-    }
-
-    html, body {
-      height: 100%;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text-primary);
-      font-family: 'Noto Serif KR', Georgia, serif;
-      overflow: hidden;
-      -webkit-font-smoothing: antialiased; /* iOS/macOS */
-      overscroll-behavior: none;           /* Android pull-to-refresh 방지 */
-    }
-
-    /* Atmospheric glow — top */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -10vh;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70vw;
-      height: 55vh;
-      background: radial-gradient(ellipse, rgba(201,169,110,0.055) 0%, transparent 72%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ────────────────────────────────────────
-       SCREEN BASE
-    ──────────────────────────────────────── */
-
-    .screen {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      /* Safe area: 노치/홈 바 영역 확보 */
-      padding:
-        max(3rem, env(safe-area-inset-top))
-        max(2rem, env(safe-area-inset-right))
-        max(3rem, env(safe-area-inset-bottom))
-        max(2rem, env(safe-area-inset-left));
-      /* 가로 모드 등 콘텐츠 넘침 대비 */
-      overflow-y: auto;
-      z-index: 1;
-      transition:
-        opacity  0.6s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .screen--exit {
-      opacity: 0 !important;
-      transform: translateY(-30px) !important;
-      pointer-events: none !important;
-    }
-
-    .screen--hidden {
-      opacity: 0;
-      transform: translateY(30px);
-      pointer-events: none;
-    }
-
-    /* ────────────────────────────────────────
-       INPUT SCREEN
-    ──────────────────────────────────────── */
-
-    /* Faint orbital rings — subliminal moon motif */
-    #input-screen::before,
-    #input-screen::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      border-radius: 50%;
-      border: 1px solid rgba(201,169,110,0.055);
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-    }
-    #input-screen::before {
-      width: min(340px, 80vw);
-      height: min(340px, 80vw);
-    }
-    #input-screen::after {
-      width: min(520px, 120vw);
-      height: min(520px, 120vw);
-      border-color: rgba(201,169,110,0.025);
-    }
-
-    .input-eyebrow {
-      font-size: 0.9rem;
-      font-weight: 200;
-      letter-spacing: 0.3em;
-      color: var(--text-secondary);
-      text-align: center;
-      margin-bottom: 1.6rem;
-      animation: fadeUp 0.8s 0.15s both;
-    }
-
-    .input-question {
-      font-size: clamp(1.8rem, 5vw, 2.4rem);
-      font-weight: 300;
-      letter-spacing: 0.04em;
-      color: var(--text-primary);
-      text-align: center;
-      line-height: 1.45;
-      margin-bottom: 3.5rem;
-      animation: fadeUp 0.8s 0.3s both;
-    }
-
-    .input-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 3rem;
-      animation: fadeUp 0.8s 0.45s both;
-    }
-
-    .date-input {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid rgba(240,230,211,0.16);
-      color: var(--text-primary);
-      font-family: 'Noto Serif KR', Georgia, serif;
-      font-size: clamp(1.3rem, 4vw, 1.65rem);
-      font-weight: 300;
-      letter-spacing: 0.08em;
-      padding: 0.6rem 0.4rem;
-      text-align: center;
-      width: min(280px, 80vw);
-      outline: none;
-      cursor: pointer;
-      transition: border-color 0.35s ease;
-    }
-
-    .date-input:focus {
-      border-bottom-color: var(--accent);
-    }
-
-    /* iOS Safari: datetime 내부 파트 색상 명시 (기기 언어 무관하게 적용) */
-    .date-input::-webkit-datetime-edit            { color: var(--text-primary); }
-    .date-input::-webkit-datetime-edit-fields-wrapper { color: var(--text-primary); }
-    .date-input::-webkit-datetime-edit-year-field  { color: var(--text-primary); }
-    .date-input::-webkit-datetime-edit-month-field { color: var(--text-primary); }
-    .date-input::-webkit-datetime-edit-day-field   { color: var(--text-primary); }
-    .date-input::-webkit-datetime-edit-text        { color: var(--text-secondary); opacity: 0.5; }
-
-    .date-input::-webkit-calendar-picker-indicator {
-      filter: invert(0.5) sepia(0.4) saturate(0.6);
-      cursor: pointer;
-      opacity: 0.65;
-    }
-
-    .input-hint {
-      font-size: 0.8rem;
-      font-weight: 200;
-      letter-spacing: 0.18em;
-      color: var(--text-secondary);
-    }
-
-    /* CTA button with expanding lines */
-    .cta-btn {
-      background: none;
-      border: none;
-      color: var(--accent);
-      font-family: 'Noto Serif KR', Georgia, serif;
-      font-size: 0.9rem;
-      font-weight: 300;
-      letter-spacing: 0.38em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      transition: letter-spacing 0.35s ease, opacity 0.2s ease;
-      animation: fadeUp 0.8s 0.6s both;
-      /* 터치 타겟 최소 44px (Apple HIG 권고) */
-      min-height: 44px;
-      padding: 0.75rem 0.5rem;
-    }
-
-    .cta-btn::before,
-    .cta-btn::after {
-      content: '';
-      display: block;
-      width: 20px;
-      height: 1px;
-      background: currentColor;
-      opacity: 0.55;
-      transition: width 0.35s ease;
-      flex-shrink: 0;
-    }
-
-    .cta-btn:hover {
-      letter-spacing: 0.5em;
-    }
-
-    .cta-btn:hover::before,
-    .cta-btn:hover::after {
-      width: 30px;
-    }
-
-    .cta-btn:active {
-      opacity: 0.7;
-    }
-
-    .error-msg {
-      font-size: 0.75rem;
-      font-weight: 300;
-      color: var(--error);
-      letter-spacing: 0.06em;
-      text-align: center;
-      margin-top: 1.8rem;
-      min-height: 1.1em;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .error-msg.visible {
-      opacity: 1;
-    }
-
-    /* ────────────────────────────────────────
-       RESULT SCREEN
-    ──────────────────────────────────────── */
-
-    .moon-icon {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 2.2rem;
-    }
-
-    .moon-icon svg {
-      filter: drop-shadow(0 0 22px rgba(201,169,110,0.3));
-    }
-
-    .result-main {
-      font-size: clamp(1.5rem, 6vw, 2.4rem);
-      font-weight: 300;
-      line-height: 1.75;
-      text-align: center;
-      color: var(--text-primary);
-      word-break: keep-all;
-      letter-spacing: -0.01em;
-      margin-bottom: 2.2rem;
-    }
-
-    .result-rule {
-      width: 28px;
-      height: 1px;
-      background: rgba(240,230,211,0.14);
-      margin: 0 auto 2rem;
-    }
-
-    .result-meta {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.55rem;
-      margin-bottom: 3.5rem;
-    }
-
-    .meta-item {
-      font-size: 0.9rem;
-      font-weight: 200;
-      letter-spacing: 0.12em;
-      color: var(--text-secondary);
-      text-align: center;
-    }
-
-
-    /* Staggered result reveal */
-    .screen--entering .moon-icon   { animation: fadeUp 0.7s 0.1s  both; }
-    .screen--entering .result-main { animation: fadeUp 0.7s 0.28s both; }
-    .screen--entering .result-rule { animation: fadeUp 0.7s 0.45s both; }
-    .screen--entering .result-meta { animation: fadeUp 0.7s 0.55s both; }
-    .screen--entering .reset-btn   { animation: fadeUp 0.7s 0.72s both; }
-
-    /* ────────────────────────────────────────
-       ANIMATIONS
-    ──────────────────────────────────────── */
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* 가로 모드 / 낮은 화면 대응 */
-    @media (max-height: 600px) {
-      .input-question  { margin-bottom: 1.5rem; }
-      .input-wrap      { margin-bottom: 1.5rem; }
-      .moon-icon       { margin-bottom: 1.2rem; }
-      .result-main     { margin-bottom: 1.2rem; font-size: clamp(1.2rem, 4vw, 1.6rem); }
-      .result-rule     { margin-bottom: 1rem; }
-      .result-meta     { margin-bottom: 2rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -355,6 +42,8 @@
     <p id="resultMain" class="result-main"></p>
     <div class="result-rule"></div>
     <div id="resultMeta" class="result-meta"></div>
+    <div id="solar-term-wheel"></div>
+    <p id="result-season"></p>
     <button id="resetBtn" class="reset-btn cta-btn">돌아가기</button>
   </div>
 
@@ -418,6 +107,15 @@
       '동지': '밤이 가장 긴 동지',
     };
 
+    /* 동지를 12시(top)에 놓고 시계방향으로 24절기 배열 */
+    const WHEEL_ORDER = [
+      '동지','소한','대한',
+      '입춘','우수','경칩','춘분','청명','곡우',
+      '입하','소만','망종','하지','소서','대서',
+      '입추','처서','백로','추분','한로','상강',
+      '입동','소설','대설',
+    ];
+
     /* ------------------------------------------------------------------ */
     /* Logic                                                                */
     /* ------------------------------------------------------------------ */
@@ -451,10 +149,52 @@
       return candidates.find(c => c.date <= inputDate) || null;
     }
 
+    function getNextSolarTerm(year, month, day) {
+      const inputDate = new Date(year, month - 1, day);
+      const candidates = [];
+      for (const y of [year, year + 1]) {
+        for (const term of SOLAR_TERMS) {
+          candidates.push({
+            name: term.name,
+            date: new Date(y, term.month - 1, term.baseDay),
+            year: y,
+            month: term.month,
+            day: term.baseDay,
+          });
+        }
+      }
+      candidates.sort((a, b) => a.date - b.date);
+      return candidates.find(c => c.date > inputDate) || null;
+    }
+
+    function getSeason(termName) {
+      if (['입춘','우수','경칩','춘분','청명','곡우'].includes(termName))
+        return { label: '봄', color: '#8ab5a0' };
+      if (['입하','소만','망종','하지','소서','대서'].includes(termName))
+        return { label: '여름', color: '#c9a96e' };
+      if (['입추','처서','백로','추분','한로','상강'].includes(termName))
+        return { label: '가을', color: '#c48b5a' };
+      if (['입동','소설','대설','동지','소한','대한'].includes(termName))
+        return { label: '겨울', color: '#7a9ec9' };
+      return null;
+    }
+
+    function josa(word) {
+      const code = word.charCodeAt(word.length - 1);
+      if (code >= 0xAC00 && code <= 0xD7A3) {
+        return (code - 0xAC00) % 28 > 0 ? '과' : '와';
+      }
+      return '과';
+    }
+
     function getLunarDate(year, month, day) {
       const cal = new KoreanLunarCalendar();
       cal.setSolarDate(year, month, day);
       return cal.getLunarCalendar();
+    }
+
+    function formatSolarDate(year, month, day) {
+      return `양력 · ${year}년 ${month}월 ${day}일`;
     }
 
     function formatLunarDate(lunar) {
@@ -511,20 +251,114 @@
     }
 
     /* ------------------------------------------------------------------ */
+    /* Solar Term Wheel SVG                                                 */
+    /* ------------------------------------------------------------------ */
+
+    function getSolarTermWheelSVG(currentTermName, nextTermName, progress = 0) {
+      const cx = 80, cy = 80, R = 60, innerR = 28;
+
+      function polar(deg, r) {
+        const rad = deg * Math.PI / 180;
+        return [cx + r * Math.sin(rad), cy - r * Math.cos(rad)];
+      }
+
+      const f = (n) => n.toFixed(2);
+      const parts = [];
+
+      /* 계절별 링 호(arc) — startIdx × 15° 부터 90° */
+      const seasonDefs = [
+        { startIdx: 3,  label: '봄',  color: 'rgba(138,181,160,0.42)',  labelColor: 'rgba(138,181,160,0.85)'  },
+        { startIdx: 9,  label: '여름', color: 'rgba(201,169,110,0.38)', labelColor: 'rgba(201,169,110,0.85)' },
+        { startIdx: 15, label: '가을', color: 'rgba(196,139,90,0.42)',  labelColor: 'rgba(196,139,90,0.85)'  },
+        { startIdx: 21, label: '겨울', color: 'rgba(122,158,201,0.42)', labelColor: 'rgba(122,158,201,0.85)' },
+      ];
+
+      for (const s of seasonDefs) {
+        const a1 = s.startIdx * 15;
+        const a2 = (s.startIdx + 6) * 15;
+        const [ox1, oy1] = polar(a1, R);
+        const [ox2, oy2] = polar(a2, R);
+        const [ix1, iy1] = polar(a1, innerR);
+        const [ix2, iy2] = polar(a2, innerR);
+        parts.push(
+          `<path d="M ${f(ox1)} ${f(oy1)} A ${R} ${R} 0 0 1 ${f(ox2)} ${f(oy2)} ` +
+          `L ${f(ix2)} ${f(iy2)} A ${innerR} ${innerR} 0 0 0 ${f(ix1)} ${f(iy1)} Z" fill="${s.color}"/>`
+        );
+        const midAngle = (s.startIdx + 3) * 15;
+        const midR = (R + innerR) / 2;
+        const [lx, ly] = polar(midAngle, midR);
+        parts.push(
+          `<text x="${f(lx)}" y="${(ly + 3.5).toFixed(2)}" text-anchor="middle" ` +
+          `font-family="'Noto Serif KR',Georgia,serif" font-size="10" font-weight="300" ` +
+          `fill="${s.labelColor}">${s.label}</text>`
+        );
+      }
+
+      /* 외곽·내부 원 */
+      parts.push(`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(240,230,211,0.22)" stroke-width="0.8"/>`);
+      parts.push(`<circle cx="${cx}" cy="${cy}" r="${innerR}" fill="none" stroke="rgba(240,230,211,0.13)" stroke-width="0.7"/>`);
+
+      /* 24개 절기 점 — 모두 동일한 흰 점 */
+      const currentIdx  = WHEEL_ORDER.indexOf(currentTermName);
+      const markerAngle = currentIdx * 15 + progress * 15;
+
+      for (let i = 0; i < 24; i++) {
+        const [x, y] = polar(i * 15, R);
+        parts.push(`<circle cx="${f(x)}" cy="${f(y)}" r="2.2" fill="rgba(240,230,211,0.48)"/>`);
+      }
+
+      /* 진행 호 — currentAngle → markerAngle */
+      if (currentIdx >= 0 && progress > 0.01) {
+        const arcR = R + 2;
+        const [ax1, ay1] = polar(currentIdx * 15, arcR);
+        const [ax2, ay2] = polar(markerAngle, arcR);
+        parts.push(
+          `<path d="M ${f(ax1)} ${f(ay1)} A ${arcR} ${arcR} 0 0 1 ${f(ax2)} ${f(ay2)}" ` +
+          `fill="none" stroke="rgba(201,169,110,0.65)" stroke-width="2" stroke-linecap="round"/>`
+        );
+      }
+
+      /* 비례 마커 (금색 채움 + 후광) */
+      if (currentIdx >= 0) {
+        const [mx, my] = polar(markerAngle, R);
+        parts.push(`<circle cx="${f(mx)}" cy="${f(my)}" r="8" fill="none" stroke="rgba(201,169,110,0.35)" stroke-width="1"/>`);
+        parts.push(`<circle cx="${f(mx)}" cy="${f(my)}" r="4.5" fill="#c9a96e"/>`);
+
+        /* 마커 → 중심 방사선 */
+        const [ox, oy] = polar(markerAngle, R - 10);
+        const [ix, iy] = polar(markerAngle, innerR + 4);
+        parts.push(`<line x1="${f(ox)}" y1="${f(oy)}" x2="${f(ix)}" y2="${f(iy)}" stroke="rgba(201,169,110,0.6)" stroke-width="0.9"/>`);
+      }
+
+      /* 중앙 계절 한 글자 */
+      const season = getSeason(currentTermName);
+      if (season) {
+        parts.push(
+          `<text x="${cx}" y="${cy + 6}" text-anchor="middle" ` +
+          `font-family="'Noto Serif KR',Georgia,serif" font-size="17" font-weight="300" ` +
+          `fill="${season.color}" letter-spacing="0.05em">${season.label}</text>`
+        );
+      }
+
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="200" height="200">${parts.join('')}</svg>`;
+    }
+
+    /* ------------------------------------------------------------------ */
     /* UI                                                                   */
     /* ------------------------------------------------------------------ */
 
-    const birthdateInput = document.getElementById('birthdate');
-    // 오늘 날짜를 기본값으로 설정
-    birthdateInput.value = new Date().toISOString().slice(0, 10);
-    const convertBtn     = document.getElementById('convertBtn');
-    const resetBtn       = document.getElementById('resetBtn');
-    const errorMsg       = document.getElementById('errorMsg');
-    const inputScreen    = document.getElementById('input-screen');
-    const resultScreen   = document.getElementById('result-screen');
-    const resultMain     = document.getElementById('resultMain');
-    const resultMeta     = document.getElementById('resultMeta');
-    const moonIcon       = document.getElementById('moonIcon');
+    const birthdateInput  = document.getElementById('birthdate');
+    birthdateInput.value  = new Date().toISOString().slice(0, 10);
+    const convertBtn      = document.getElementById('convertBtn');
+    const resetBtn        = document.getElementById('resetBtn');
+    const errorMsg        = document.getElementById('errorMsg');
+    const inputScreen     = document.getElementById('input-screen');
+    const resultScreen    = document.getElementById('result-screen');
+    const resultMain      = document.getElementById('resultMain');
+    const resultMeta      = document.getElementById('resultMeta');
+    const moonIcon        = document.getElementById('moonIcon');
+    const wheelEl         = document.getElementById('solar-term-wheel');
+    const seasonEl        = document.getElementById('result-season');
 
     function showError(msg) {
       errorMsg.textContent = msg;
@@ -535,21 +369,35 @@
       errorMsg.classList.remove('visible');
     }
 
-    function showResult(lunar, term) {
+    function showResult(year, month, day, lunar, term, nextTerm) {
       const moonWording = getMoonPhaseWording(lunar.day);
       const termWording = SOLAR_TERM_WORDING[term.name];
+      const season      = getSeason(term.name);
 
-      // Exit input screen
       inputScreen.classList.add('screen--exit');
 
-      // Populate and reveal result after exit animation starts
       setTimeout(() => {
-        moonIcon.innerHTML = getMoonSVG(lunar.day);
+        moonIcon.innerHTML   = getMoonSVG(lunar.day);
         resultMain.innerHTML = `${termWording},<br>${moonWording}`;
         resultMeta.innerHTML = `
+          <span class="meta-item">${formatSolarDate(year, month, day)}</span>
           <span class="meta-item">${formatLunarDate(lunar)}</span>
-          <span class="meta-item">${formatSolarTermDate(term)}</span>
         `;
+
+        const birthday = new Date(year, month - 1, day);
+        const progress = nextTerm
+          ? (birthday - term.date) / (nextTerm.date - term.date)
+          : 0;
+        wheelEl.innerHTML = getSolarTermWheelSVG(term.name, nextTerm?.name, progress);
+
+        if (season && nextTerm) {
+          seasonEl.textContent = `${season.label} · ${term.name}${josa(term.name)} ${nextTerm.name} 사이`;
+        } else if (season) {
+          seasonEl.textContent = season.label;
+        } else {
+          seasonEl.textContent = '';
+        }
+
         resultScreen.classList.remove('screen--hidden');
         resultScreen.classList.add('screen--entering');
       }, 380);
@@ -595,7 +443,8 @@
         return;
       }
 
-      showResult(lunar, term);
+      const nextTerm = getNextSolarTerm(year, month, day);
+      showResult(year, month, day, lunar, term, nextTerm);
     }
 
     convertBtn.addEventListener('click', convert);
